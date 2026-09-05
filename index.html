@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Pengetahuan Umum</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; color: #333; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        .hidden { display: none !important; }
+        h2 { margin-bottom: 20px; font-size: 24px; }
+        button { background: #007bff; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; width: 100%; margin: 10px 0; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        .btn-true { background: #28a745; }
+        .btn-false { background: #dc3545; }
+        .timer { font-size: 20px; font-weight: bold; color: #ffc107; margin-bottom: 15px; background: #222; display: inline-block; padding: 5px 15px; border-radius: 20px; }
+        .progress { font-size: 14px; color: #777; margin-bottom: 10px; }
+        .score-details { text-align: left; margin: 20px 0; font-size: 16px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+    <div id="slide-start" class="card">
+        <h2>Kuis Pengetahuan Umum</h2>
+        <p style="margin-bottom: 20px; color: #666;">10 Soal Benar/Salah. Waktu per soal 10 detik!</p>
+        <button onclick="startQuiz()">Mulai Kuis</button>
+    </div>
+
+    <div id="slide-quiz" class="card hidden">
+        <div class="progress">Pertanyaan <span id="current-question-num">1</span> dari 10</div>
+        <div id="timer" class="timer">10</div>
+        <h3 id="question-text" style="margin-bottom: 20px; min-height: 60px;">Teks Pertanyaan</h3>
+        <button class="btn-true" onclick="checkAnswer(true)">BENAR</button>
+        <button class="btn-false" onclick="checkAnswer(false)">SALAH</button>
+    </div>
+
+    <div id="slide-result" class="card hidden">
+        <h2>Hasil Kuis Anda</h2>
+        <div class="score-details">
+            <p><strong>Total Pertanyaan:</strong> 10</p>
+            <p><strong>Jawaban Benar:</strong> <span id="total-correct" style="color: #28a745; font-weight: bold;">0</span></p>
+            <p><strong>Jawaban Salah:</strong> <span id="total-wrong" style="color: #dc3545; font-weight: bold;">0</span></p>
+            <p><strong>Nilai Akhir:</strong> <span id="final-score" style="font-size: 22px; color: #007bff; font-weight: bold;">0</span></p>
+        </div>
+        <button onclick="restartQuiz()">Main Lagi</button>
+    </div>
+
+    <script>
+        const questions = [
+            { text: "Monas terletak di Kota Jakarta.", answer: true },
+            { text: "Lagu Kebangsaan Indonesia adalah Indonesia Raya.", answer: true },
+            { text: "Matahari terbit dari sebelah barat.", answer: false },
+            { text: "Mamalia terbesar di bumi adalah gajah.", answer: false },
+            { text: "Ibu kota negara Jepang adalah Tokyo.", answer: true },
+            { text: "Air mendidih pada suhu 50 derajat Celsius.", answer: false },
+            { text: "Benua terbesar di dunia adalah Asia.", answer: true },
+            { text: "Sudut siku-siku memiliki besar 90 derajat.", answer: true },
+            { text: "Mata uang negara Malaysia adalah Peso.", answer: false },
+            { text: "Oksigen adalah gas yang kita hirup untuk bernapas.", answer: true }
+        ];
+
+        let currentQuestionIndex = 0;
+        let correctAnswersCount = 0;
+        let wrongAnswersCount = 0;
+        let timerInterval;
+        let timeLeft = 10;
+
+        function startQuiz() {
+            document.getElementById('slide-start').classList.add('hidden');
+            document.getElementById('slide-quiz').classList.remove('hidden');
+            currentQuestionIndex = 0;
+            correctAnswersCount = 0;
+            wrongAnswersCount = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            clearInterval(timerInterval);
+            timeLeft = 10;
+            document.getElementById('timer').innerText = timeLeft;
+            document.getElementById('current-question-num').innerText = currentQuestionIndex + 1;
+            document.getElementById('question-text').innerText = questions[currentQuestionIndex].text;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    wrongAnswersCount++;
+                    nextQuestion();
+                }
+            }, 1000);
+        }
+
+        function checkAnswer(userAnswer) {
+            clearInterval(timerInterval);
+            if (userAnswer === questions[currentQuestionIndex].answer) {
+                correctAnswersCount++;
+            } else {
+                wrongAnswersCount++;
+            }
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('slide-quiz').classList.add('hidden');
+            document.getElementById('slide-result').classList.remove('hidden');
+            document.getElementById('total-correct').innerText = correctAnswersCount;
+            document.getElementById('total-wrong').innerText = wrongAnswersCount;
+            document.getElementById('final-score').innerText = (correctAnswersCount / questions.length) * 100;
+        }
+
+        function restartQuiz() {
+            document.getElementById('slide-result').classList.add('hidden');
+            document.getElementById('slide-start').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
